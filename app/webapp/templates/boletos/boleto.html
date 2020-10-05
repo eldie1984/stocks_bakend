@@ -1,0 +1,350 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %}
+{% block title %}
+    {% if add_Boleto %}
+        Add Boleto
+    {% else %}
+        Edit Boleto
+    {% endif %}
+{% endblock %}
+{% block body %}
+<div class="content-section">
+ <div class="outer">
+    <div class="middle">
+      <div class="inner">
+<div class="center">
+            {% if add_Boleto %}
+                <h1>Add Boleto</h1>
+            {% else %}
+                <h1>Edit Boleto</h1>
+
+            {% endif %}
+            <br/>
+            </div>
+            <div class="container">
+            <form method="POST">
+              <div class="form-row">
+              <div class="form-group col">{{ form.numero.label }} {{ form.numero(size=20) }}</div>
+
+              <div class="input-group mb-3 col">{{ form.tipo_operacion.label }}{{ form.tipo_operacion(class="form-control",onChange="allowInteres(this)") }}</div>
+              <div class="input-group mb-3 col">{{ form.moneda.label }} {{ form.moneda(class="form-control",onChange="allowEcahnge(this)") }}</div>
+              <div class="form-group col-md-auto">
+              <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                Add Symbol
+              </button>
+              </div>
+              </div>
+              <div class="form-row">
+              <div class="col-md-auto">{{ form.fecha_concertacion.label }} {{ form.fecha_concertacion(type="date")}}</div>
+              <div class="col-md-auto">{{ form.fecha_liquidacion.label }} {{ form.fecha_liquidacion(type="date") }}</div>
+              <div class="col-md-auto"> {{ form.tiker(placeholder='Ticker') }}</div>
+              <div class="col-md-auto">{{ form.cantidad(placeholder='Cantidad',onChange="checkNumber(this)")}}</div>
+              </div>
+
+
+              <div class="form-row">
+                <div class="form-group col-md-auto">{{ form.arancel.label }} {{ form.arancel(size=20,onChange="checkNumber(this)") }}</div>
+                <div class="form-group col-md-auto">{{ form.perc_arancel(size=20,onChange="checkNumber(this)",placeholder='Porcentaje %') }}</div>
+                <div class="form-group col-md-auto">{{ form.mercado_importe.label }} {{ form.mercado_importe(onChange="checkNumber(this)") }}</div>
+                <div class="form-group col-md-auto">{{ form.iva.label }} {{ form.iva(size=20) }}</div>
+              </div>
+              <div class="form-row"  id='tipo_cambio_block'>
+                <div class="form-group col-md-4">{{ form.tipo_cambio.label }} {{ form.tipo_cambio(onChange="checkNumber(this)") }}</div>
+                <div class="form-group col-md-4">{{ form.tipo_cambio_arancel.label }} {{ form.tipo_cambio_arancel(onChange="checkNumber(this)") }}</div>
+              </div>
+              <div class="form-row">
+                <div class="form-group col-md-auto">{{ form.bruto.label }} {{ form.bruto(placeholder='Bruto',onChange="checkNumber(this)") }}</div>
+                <div class="form-group col-md-auto" >{{ form.neto.label }} {{ form.neto(placeholder='Neto',onChange="checkNumber(this)") }}</div>
+                <div class="input-group mb-3 col">{{ form.alyc_id(class="form-control") }}</div>
+              </div>
+
+              <div class="form-row" id='interes_block'>
+                <div class="form-group col-md-auto">{{ form.interes.label }} {{ form.interes(onChange="checkNumber(this)") }}</div>
+              </div>
+              <div class="form-row" >
+                <table
+                  id="table"
+                  data-click-to-select="true"
+                  data-id-field="id"
+                  data-response-handler="responseHandler">
+                </table>
+              </div>
+              <div id="subforms-container">
+                {% for subform in form.shares %}
+                    <div id="share-{{ loop.index0 }}-form" class="subform" data-index="{{ loop.index0 }}">
+                        {{ subform.volume.label }}
+                        {{ subform.volume }}
+
+                        {{ subform.price.label }}
+                        {{ subform.price}}
+                    </div>
+                {% endfor %}
+            </div>
+
+              <div class="form-row">
+              <button type="submit" class="btn btn-primary">Cargar Boleto</button>
+              </div>
+              {{ form.csrf_token }}
+
+              {% for field in form.errors %}
+              <div class="alert alert-error">
+                   {{ field }}
+              </div>
+              {% endfor %}
+          </form>
+          <div id="share-_-form" style="display:none" data-index="_">
+             <input id="shares-_-volume" name="shares-_-volume" type="number" value="">
+             <input id="shares-_-price" name="shares-_-price" type="number">
+
+         </div>
+      </div>
+      <!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+    <label for="volume">Volume</label>
+    <input type="email" class="form-control" id="volume_symbol" placeholder="Enter volume">
+  </div>
+  <div class="form-group">
+    <label for="price">Price</label>
+    <input type="number" class="form-control" id="price_symbol" placeholder="Price">
+  </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id='add_symbol'>Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block js %}
+<script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+
+<script>
+  $('#myModal').on('shown.bs.modal', function () {
+  $('#myInput').trigger('focus')
+    })
+    arancelElement =document.getElementById('arancel')
+
+    arancelElement.addEventListener('change', (event) => {
+      const resultado = document.getElementById('perc_arancel');
+      const bruto = parseInt(document.getElementById('bruto').value);
+      if(parseInt(event.target.value)>0){
+      resultado.value = parseInt(event.target.value) * 100 / bruto;
+    }else{
+      resultado.value =0
+    }
+    });
+
+    function checkNumber(e) {
+      if (e.value.includes(',') && e.value.includes('.')) {
+      e.value=e.value.replace('.', '').replace(',', '.');
+      }
+      else {
+        e.value=e.value.replace(',', '.');
+      }
+    }
+    document.getElementById("tipo_cambio_block").style.display = "none"
+    function allowEcahnge(e) {
+      if (e.value === "d") {
+        document.getElementById("tipo_cambio_block").style.display = "inline"
+      }else{document.getElementById("tipo_cambio_block").style.display = "none"}
+    }
+    document.getElementById("interes_block").style.display = "none"
+    function allowInteres(e) {
+      if (e.value === "acc") {
+        document.getElementById("interes_block").style.display = "inline"
+      }else{document.getElementById("interes_block").style.display = "none"}
+    }
+
+    function myFunction(e){
+      console.log(document.getElementById("volume_symbol"))
+      console.log(document.getElementById("price_symbol"))
+    }
+
+    var $table = $('#table')
+    var $button = $('#add_symbol')
+    var startId =0
+
+
+    $(function() {
+      $button.click(function () {
+        volume=Number(document.getElementById("volume_symbol").value)
+        price=Number(document.getElementById("price_symbol").value)
+        addForm(startId,volume,price)
+        $('#cantidad').attr('value',Number($('#cantidad').attr('value'))+volume);
+        $('#bruto').attr('value',Number($('#bruto').attr('value'))+volume*price);
+        document.getElementById("volume_symbol").value=''
+        document.getElementById("price_symbol").value=''
+      })
+
+    })
+
+    function operateFormatter(value, row, index) {
+        return [
+          '<a class="remove" href="javascript:void(0)" title="Remove">',
+          '<i class="fa fa-trash"></i>',
+          '</a>'
+        ].join('')
+      }
+
+      window.operateEvents = {
+        'click .remove': function (e, value, row, index) {
+          $table.bootstrapTable('remove', {
+            field: 'id',
+            values: [row.id]
+          })
+        }
+      }
+
+    function initTable() {
+   $table.bootstrapTable('destroy')
+   $table.bootstrapTable({
+     columns: [
+     {
+       title: 'Id',
+       field: 'id',
+       align: 'center',
+       valign: 'middle',
+     }, {
+       title: 'Volume',
+       field: 'volume',
+       align: 'center'
+     },{
+       field: 'price',
+       title: 'Price',
+       align: 'center'
+     }, {
+       field: 'operate',
+       title: 'Operate',
+       align: 'center',
+       clickToSelect: false,
+       events: window.operateEvents,
+       formatter: operateFormatter
+     }
+     ]
+   })
+   }
+  $(function() {
+     initTable()
+   })
+
+</script>
+        <script>
+            /**
+             * Adjust the indices of form fields when removing items.
+             */
+            function adjustIndices(removedIndex) {
+                var $forms = $('.subform');
+
+                $forms.each(function(i) {
+                    var $form = $(this);
+                    var index = parseInt($form.data('index'));
+                    var newIndex = index - 1;
+
+                    if (index < removedIndex) {
+                        // Skip
+                        return true;
+                    }
+
+                    // Change ID in form itself
+                    $form.attr('id', $form.attr('id').replace(index, newIndex));
+                    $form.data('index', newIndex);
+
+                    // Change IDs in form inputs
+                    $form.find('input').each(function(j) {
+                        var $item = $(this);
+                        $item.attr('id', $item.attr('id').replace(index, newIndex));
+                        $item.attr('name', $item.attr('name').replace(index, newIndex));
+                    });
+                });
+            }
+
+            /**
+             * Remove a form.
+             */
+            function removeForm() {
+                var $removedForm = $(this).closest('.subform');
+                var removedIndex = parseInt($removedForm.data('index'));
+
+                $removedForm.remove();
+
+                // Update indices
+                adjustIndices(removedIndex);
+            }
+
+            /**
+             * Add a new form.
+             */
+            function addForm(id,volume,price) {
+                var $templateForm = $('#share-_-form');
+
+                if (!$templateForm) {
+                    console.log('[ERROR] Cannot find template');
+                    return;
+                }
+
+                // Get Last index
+                var $lastForm = $('.subform').last();
+
+                var newIndex = 0;
+
+                if ($lastForm.length > 0) {
+                    newIndex = parseInt($lastForm.data('index')) + 1;
+                }
+
+
+                // Add elements
+                var $newForm = $templateForm.clone();
+
+                $newForm.attr('id', $newForm.attr('id').replace('_', newIndex));
+                $newForm.data('index', newIndex);
+
+
+                $newForm.find('input').each(function(idx) {
+                    var $item = $(this);
+                    if ($item.attr('id')==='shares-_-volume'){
+                      $item.attr('value', volume);
+                    }else if ($item.attr('id')==='shares-_-price'){
+                      $item.attr('value', price);
+                    }
+                    $item.attr('id', $item.attr('id').replace('_', newIndex));
+                    $item.attr('name', $item.attr('name').replace('_', newIndex));
+
+                });
+                $table.bootstrapTable('append', {id: newIndex,
+                volume: volume,
+                price: price})
+                // Append
+                $('#subforms-container').append($newForm);
+                $newForm.addClass('subform');
+                $newForm.removeClass('is-hidden');
+
+                $newForm.find('.remove').click(removeForm);
+            }
+
+
+            $(document).ready(function() {
+                $('#add').click(addForm);
+                $('.remove').click(removeForm);
+            });
+        </script>
+
+{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css">
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %}
+{% block title %}
+    {% if add_Boleto %}
+        Add Boleto
+    {% else %}
+        Edit Boleto
+    {% endif %}
+{% endblock %}
+{% block body %}
+<div class="content-section">
+ <div class="outer">
+    <div class="middle">
+      <div class="inner">
+<div class="center">
+            {% if add_Boleto %}
+                <h1>Add Boleto</h1>
+            {% else %}
+                <h1>Edit Boleto</h1>
+            {% endif %}
+            <br/>
+            </div>
+            <div class="container">
+          {{ wtf.quick_form(form) }}
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block js %}
+<script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+
+{% endblock %}
+{% block css %}
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css">
+
+{% endblock %}

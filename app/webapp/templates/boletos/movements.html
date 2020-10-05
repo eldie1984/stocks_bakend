@@ -1,0 +1,78 @@
+{% import "bootstrap/utils.html" as utils %}
+{% extends "base.html" %}
+{% block title %}boletos{% endblock %}
+{% block body %}
+<div class="content-section">
+  <div class="outer">
+    <div class="middle">
+      <div class="inner">
+        <br/>
+        {{ utils.flashed_messages() }}
+        <br/>
+        <h1 style="text-align:center;">boletos</h1>
+        {% if boletos %}
+          <hr class="intro-divider">
+          <div class="container">
+
+            <table
+                data-toggle="table"
+                data-search="true"
+                data-show-columns="true"
+                data-pagination="true"
+                data-pagination-loop="false">
+            <thead>
+              <tr>
+                <th data-field="numero"> Numero </th>
+                <th data-field="fecha_liquidacion"> Fecha Liquidacion </th>
+                <th data-field="tipo_operacion"> Tipo Operacion </th>
+                <th data-field="ticker"> Tiker </th>
+                <th data-field="cantidad"> Cantidad </th>
+                <th data-field="neto"> Neto </th>
+                <th> Operaciones </th>
+              </tr>
+            </thead>
+            <tbody>
+            {% for boleto in boletos %}
+            <tr>
+              <td> {{ boleto.numero }} </td>
+              <td> {{ boleto.fecha_liquidacion }} </td>
+              <td> {{ boleto.tipo_operacion }} </td>
+              <td> {{ boleto.tiker }} </td>
+              <td> {{ boleto.cantidad }} </td>
+              <td> {{ boleto.neto }} </td>
+
+              <td>
+            <a class="edit" href="{{ url_for('boletos.edit_boleto', id=boleto.id) }}" title="edit">',
+            <i class="fa fa-pencil"></i>
+            </a>
+            <a class="remove" href="{{ url_for('boletos.delete_boleto', id=boleto.id) }}" title="Remove">
+            <i class="fa fa-trash"></i>
+            </a>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+        {% else %}
+          <div style="text-align: center">
+            <h3> No boletos have been added. </h3>
+            <hr class="intro-divider">
+        {% endif %}
+          <a href="{{ url_for('boletos.add_boleto') }}" class="btn btn-default btn-lg">
+            <i class="fa fa-plus"></i>
+            Add boleto
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.css">
+
+{% endblock %}
+{% block js %}
+<script src="https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js"></script>
+{% endblock %}
