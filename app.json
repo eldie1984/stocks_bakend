@@ -15,7 +15,7 @@
       },
       "FLASK_APP": {
         "description": "Name of entrypoint app file in the root directory.",
-        "value": "dashapp"
+        "value": "stocks"
       }
     },
     "formation": {
