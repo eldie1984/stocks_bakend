@@ -6,7 +6,7 @@
       "Dash",
       "Plotly"
     ],
-    "repository": "https://github.com/eldie1984/stocks_bakend",
+    "repository": "https://github.com/eldie1984/python_stocks",
     "success_url": "/",
     "env": {
       "SECRET_KEY": {
@@ -15,7 +15,7 @@
       },
       "FLASK_APP": {
         "description": "Name of entrypoint app file in the root directory.",
-        "value": "stocks"
+        "value": "dashapp"
       }
     },
     "formation": {
